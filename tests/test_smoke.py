@@ -1,3 +1,11 @@
+"""
+test_smoke.py
+--------------
+Purpose:
+- Ensure the app config is correctly loaded.
+
+"""
+
 from nl2sql_assistant.config import CONFIG
 
 

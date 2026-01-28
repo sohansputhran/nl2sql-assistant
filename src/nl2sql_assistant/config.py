@@ -1,3 +1,11 @@
+"""
+config.py
+------------
+Purpose:
+- Define the application configuration.
+
+"""
+
 from dataclasses import dataclass
 
 
