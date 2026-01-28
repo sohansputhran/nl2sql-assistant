@@ -8,9 +8,31 @@ Purpose:
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from pathlib import Path
 from typing import Any
+
+SELECT_ONLY_RE = re.compile(r"^\s*select\b", re.IGNORECASE)
+
+
+def validate_select_only(sql: str) -> None:
+    """
+    Minimal SQL safety guardrail for early stages.
+    - Only allow SELECT queries.
+    - Block obvious multi-statement attempts using ';'
+    """
+    cleaned = sql.strip()
+    if not SELECT_ONLY_RE.match(cleaned):
+        raise ValueError("Only SELECT queries are allowed.")
+
+    # Block multi-statement patterns. One trailing semicolon is okay.
+    semicolons = cleaned.count(";")
+    if semicolons > 1:
+        raise ValueError("Multiple SQL statements are not allowed.")
+
+    if semicolons == 1 and not cleaned.rstrip().endswith(";"):
+        raise ValueError("Invalid semicolon usage detected.")
 
 
 def run_query(db_path: Path, sql: str, limit: int = 200) -> tuple[list[str], list[tuple[Any, ...]]]:
