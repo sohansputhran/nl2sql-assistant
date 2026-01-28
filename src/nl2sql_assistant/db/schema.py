@@ -11,6 +11,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+
 def get_table_names(conn: sqlite3.Connection) -> list[str]:
     """
     Return non-system table names sorted alphabetically.
