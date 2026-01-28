@@ -1,3 +1,12 @@
+"""
+Home.py
+------------
+Purpose:
+- This is the home page of the Streamlit app for NL2SQL Assistant.
+- It provides an overview of the app and its features.
+
+"""
+
 import streamlit as st
 
 st.set_page_config(page_title="NL2SQL Assistant", page_icon="🧠", layout="wide")

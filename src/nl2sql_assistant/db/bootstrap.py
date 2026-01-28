@@ -1,3 +1,11 @@
+"""
+bootstrap.py
+------------
+Purpose:
+- Create (or re-use) a tiny, realistic SQLite database for local development + demos.
+
+"""
+
 from __future__ import annotations
 
 import sqlite3
@@ -5,11 +13,28 @@ from pathlib import Path
 
 
 def ensure_sample_db(db_path: Path) -> Path:
+    """
+    Ensure the SQLite DB exists and is seeded with sample data.
+
+    Parameters
+    ----------
+    db_path : Path
+        Path to the SQLite file (e.g., data/sample.db)
+
+    Returns
+    -------
+    Path
+        Same db_path, guaranteed to exist with tables and seed data.
+    """
+    # Create folder like ./data if missing
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # Connect to SQLite (creates file if not present)
     with sqlite3.connect(db_path) as conn:
+        # Enforce foreign key constraints (SQLite requires enabling this)
         conn.execute("PRAGMA foreign_keys = ON;")
 
+        # Create tables if they don't exist
         conn.executescript(
             """
             CREATE TABLE IF NOT EXISTS customers (
@@ -46,7 +71,9 @@ def ensure_sample_db(db_path: Path) -> Path:
             """
         )
 
-        # Seed data only if empty
+        # ---- Seed data: insert only if table is empty ----
+
+        # Customers
         cur = conn.execute("SELECT COUNT(*) FROM customers;")
         if cur.fetchone()[0] == 0:
             conn.executemany(
@@ -59,6 +86,7 @@ def ensure_sample_db(db_path: Path) -> Path:
                 ],
             )
 
+        # Products
         cur = conn.execute("SELECT COUNT(*) FROM products;")
         if cur.fetchone()[0] == 0:
             conn.executemany(
@@ -71,6 +99,7 @@ def ensure_sample_db(db_path: Path) -> Path:
                 ],
             )
 
+        # Orders
         cur = conn.execute("SELECT COUNT(*) FROM orders;")
         if cur.fetchone()[0] == 0:
             conn.executemany(
@@ -83,6 +112,7 @@ def ensure_sample_db(db_path: Path) -> Path:
                 ],
             )
 
+        # Orders Items
         cur = conn.execute("SELECT COUNT(*) FROM order_items;")
         if cur.fetchone()[0] == 0:
             conn.executemany(
