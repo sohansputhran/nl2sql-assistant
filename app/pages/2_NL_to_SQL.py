@@ -59,7 +59,7 @@ if run:
         cols, rows = run_query(DB_PATH, sql, limit=200)
         df = pd.DataFrame(rows, columns=cols)
         st.success(f"Returned {len(df)} rows.")
-        st.dataframe(df, width='stretch')
+        st.dataframe(df, width="stretch")
     except Exception as e:
         st.error(str(e))
 

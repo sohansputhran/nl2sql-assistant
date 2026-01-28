@@ -30,10 +30,10 @@ def validate_select_only(sql: str) -> None:
     semicolons = cleaned.count(";")
     if semicolons > 1:
         raise ValueError("Multiple SQL statements are not allowed.")
-    
+
     if semicolons == 1 and not cleaned.rstrip().endswith(";"):
         raise ValueError("Invalid semicolon usage detected.")
-    
+
 
 def run_query(db_path: Path, sql: str, limit: int = 200) -> tuple[list[str], list[tuple[Any, ...]]]:
     """
