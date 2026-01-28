@@ -1,4 +1,4 @@
-# NL2SQL Assistant (Open-Source)
+# NL2SQL Assistant
 Schema-aware Natural Language to SQL assistant using open-source LLMs, Streamlit, and CI/CD — built incrementally using Agile methodology.
 
 ---
