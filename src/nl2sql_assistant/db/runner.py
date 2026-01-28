@@ -42,10 +42,10 @@ def run_query(db_path: Path, sql: str, limit: int = 200) -> tuple[list[str], lis
     with sqlite3.connect(db_path) as conn:
         # Add LIMIT defensively (even if user forgets)
         cur = conn.execute(f"{sql_clean} LIMIT {int(limit)};")
-        
+
         # Extract column names from cursor metadata
         colnames = [d[0] for d in cur.description] if cur.description else []
-        
+
         # Fetch all rows (bounded by limit)
         rows = cur.fetchall()
 

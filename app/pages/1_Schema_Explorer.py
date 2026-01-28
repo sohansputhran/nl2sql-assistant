@@ -60,7 +60,7 @@ if run:
         cols, rows = run_query(DB_PATH, sql, limit=int(limit))
         df = pd.DataFrame(rows, columns=cols)
         st.success(f"Returned {len(df)} rows.")
-        st.dataframe(df, width='stretch')
+        st.dataframe(df, width="stretch")
     except Exception as e:
         # Show a clean error for invalid SQL or non-SELECT queries
         st.error(str(e))

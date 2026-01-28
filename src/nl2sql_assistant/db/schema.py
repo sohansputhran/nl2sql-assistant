@@ -24,6 +24,7 @@ def get_table_names(conn: sqlite3.Connection) -> list[str]:
     ).fetchall()
     return [r[0] for r in rows]
 
+
 def get_table_columns(conn: sqlite3.Connection, table: str) -> list[dict[str, str]]:
     """
     Return column metadata for a given table.
@@ -45,6 +46,7 @@ def get_table_columns(conn: sqlite3.Connection, table: str) -> list[dict[str, st
             }
         )
     return cols
+
 
 def schema_as_text(db_path: Path) -> str:
     """
