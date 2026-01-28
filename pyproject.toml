@@ -1,21 +1,69 @@
+# ------------------------------------------------------------
+# Project metadata (PEP 621 compliant)
+# This defines the package identity and runtime requirements
+# ------------------------------------------------------------
 [project]
 name = "nl2sql-assistant"
 version = "0.1.0"
 description = "Schema-aware NL to SQL assistant (open-source LLM) deployed with Streamlit"
 requires-python = ">=3.11"
-dependencies = []
 
+# Runtime dependencies are intentionally minimal at early stages.
+# Additional libraries (LangChain, Ollama client, etc.)
+# will be added incrementally per Agile stage.
+
+dependencies = [
+    "streamlit>=1.35.0",
+    "pandas>=2.2.0",
+    "python-dotenv>=1.0.1",
+]
+
+# ------------------------------------------------------------
+# Ruff configuration
+# Ruff is used for:
+# - Linting (code quality & correctness)
+# - Formatting (replaces black + isort)
+# ------------------------------------------------------------
 [tool.ruff]
+
+# Maximum line length enforced across the project
 line-length = 100
+
+# Target Python version for linting rules
 target-version = "py311"
 
+# ------------------------------------------------------------
+# Ruff lint rules
+# ------------------------------------------------------------
 [tool.ruff.lint]
+
+# Selected rule groups:
+# E  - pycodestyle errors
+# F  - pyflakes (unused imports, undefined names)
+# I  - import sorting
+# B  - flake8-bugbear (common bugs)
+# UP - pyupgrade (modern Python best practices)
 select = ["E", "F", "I", "B", "UP"]
+
+# Ignore long line warnings (handled by formatter instead)
 ignore = ["E501"]
 
+# ------------------------------------------------------------
+# Ruff formatter configuration
+# ------------------------------------------------------------
 [tool.ruff.format]
+
+# Enforce consistent double quotes across the codebase
 quote-style = "double"
 
+# ------------------------------------------------------------
+# Pytest configuration
+# ------------------------------------------------------------
 [tool.pytest.ini_options]
+
+# Directory where tests are located
 testpaths = ["tests"]
+
+# Add `src/` to Python path so imports work correctly
+# This enables `from nl2sql_assistant import ...`
 pythonpath = ["src"]
