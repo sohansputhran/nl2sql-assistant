@@ -9,11 +9,9 @@ Purpose:
 from __future__ import annotations
 
 import re
-
 import sqlite3
 from pathlib import Path
 from typing import Any
-
 
 SELECT_ONLY_RE = re.compile(r"^\s*select\b", re.IGNORECASE)
 
