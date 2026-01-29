@@ -8,6 +8,7 @@ from nl2sql_assistant.chains.sql_generator import generate_sql
 from nl2sql_assistant.db.bootstrap import ensure_sample_db
 from nl2sql_assistant.db.runner import run_query, validate_select_only
 from nl2sql_assistant.db.schema import schema_as_text
+from nl2sql_assistant.chains.sql_explainer import explain_sql  # import the explain_sql function
 
 st.set_page_config(page_title="NL → SQL", layout="wide")
 
@@ -112,3 +113,6 @@ if run:
         st.dataframe(df, width="stretch")
     except Exception as e:
         st.error(str(e))
+        
+with st.expander("What does this SQL do?", expanded=True):
+    st.write(explain_sql(schema_text, sql))
