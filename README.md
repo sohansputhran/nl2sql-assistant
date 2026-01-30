@@ -1,16 +1,61 @@
-# 🧠 NL2SQL Assistant (Open-Source)
+# NL2SQL Assistant (Open‑Source, Production‑Oriented)
 
-A **schema-aware Natural Language → SQL assistant** built using **open-source LLMs**, **Streamlit**, and **CI/CD**, developed incrementally using **Agile methodology**.
+A **schema‑aware Natural Language → SQL system** built using **open‑source LLMs**, **RAG**, **Streamlit**, and **CI/CD**, developed step‑by‑step using **Agile methodology**.
+
+This project goes beyond demos and focuses on **safe, explainable, human‑in‑the‑loop AI for databases**.
 
 ---
 
-## 🚀 Project Vision
-Build a **production-grade NL → SQL system** that:
-- Generates safe, executable SQL from natural language
-- Uses **open-source LLMs only**
-- Applies **guardrails & risk classification**
+## Project Vision
+
+Build a **real‑world NL → SQL assistant** that:
+
+- Converts natural language into **SQL queries (read + write)**
+- Uses **open‑source LLMs only** (via Ollama)
+- Applies **guardrails, validation, and risk classification**
+- Uses **RAG** to ground database write operations
+- Requires **explicit human confirmation** before data modification
 - Is fully deployable with **Streamlit**
-- Follows **Agile + CI/CD best practices**
+- Follows **Agile development, CI/CD, and testing best practices**
+
+---
+
+## Current Status
+
+### ✅ Stage 0 – Foundation
+- Streamlit application skeleton
+- Ruff linting & formatting
+- Pytest test suite
+- GitHub Actions CI pipeline
+
+### ✅ Stage 1 – SQLite Schema Explorer
+- Sample SQLite database
+- Prompt‑ready schema extraction
+- Schema Explorer UI
+- SELECT‑only query runner
+
+### ✅ Stage 2 – NL → SQL (Read Queries)
+- Open‑source LLM adapter (Ollama)
+- Few‑shot PromptTemplates
+- Schema‑aware SQL generation
+- SELECT‑only hard validation
+
+### ✅ Stage 3 – Guardrails & Risk Classification
+- LLM‑as‑critic pattern
+- Structured JSON risk output
+- Risk levels: low / medium / high
+
+### ✅ Stage 4 – UX & Explainability
+- Auto‑run risk checks
+- Natural language SQL explanation
+- Optional SQL auto‑fix
+
+### ✅ Stage 5 – Write Mode with RAG
+- Intent‑aware write pipeline
+- RAG‑grounded SQL generation
+- Strict validation + transactions
+- Database backup & rollback
+- Human‑in‑the‑loop confirmation
 
 ---
 
@@ -19,7 +64,8 @@ Build a **production-grade NL → SQL system** that:
 - Streamlit
 - SQLite
 - LangChain
-- Ollama (open-source LLMs)
+- Ollama
+- RAG (BM25)
 - Ruff
 - Pytest
 - GitHub Actions
