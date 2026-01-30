@@ -9,6 +9,11 @@ Purpose:
 
 import streamlit as st
 
+# Warm up cached resources so pages load fast and consistently.
+from nl2sql_assistant.app_state import get_rag_index
+
+get_rag_index()
+
 st.set_page_config(page_title="NL2SQL Assistant", page_icon="🧠", layout="wide")
 
 st.title("NL2SQL Assistant")
