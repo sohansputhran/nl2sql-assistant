@@ -3,6 +3,9 @@ from __future__ import annotations
 from langchain_core.prompts import PromptTemplate
 
 # JSON-only output makes downstream execution predictable + testable.
+# IMPORTANT:
+# - PromptTemplate treats { ... } as variables.
+# - So any literal JSON braces must be escaped as {{ ... }}.
 WRITE_SQL_PROMPT = PromptTemplate(
     input_variables=["context", "user_prompt"],
     template=(
@@ -12,11 +15,11 @@ WRITE_SQL_PROMPT = PromptTemplate(
         "Context:\n{context}\n\n"
         "User request:\n{user_prompt}\n\n"
         "Return JSON:\n"
-        "{\n"
+        "{{\n"
         '  "sql": "single write statement (INSERT/UPDATE/DELETE)",\n'
-        '  "params": { "param_name": "value" },\n'
-        '  "safety_notes": [string]\n'
-        "}\n\n"
+        '  "params": {{ "param_name": "value" }},\n'
+        '  "safety_notes": ["string"]\n'
+        "}}\n\n"
         "Rules:\n"
         "- For UPDATE/DELETE: include a WHERE clause.\n"
         "- Prefer parameterized SQL using named parameters (:param).\n"

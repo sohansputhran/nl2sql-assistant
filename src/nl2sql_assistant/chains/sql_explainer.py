@@ -1,6 +1,8 @@
 from langchain_core.output_parsers import StrOutputParser
+
 from nl2sql_assistant.llm.ollama_client import get_chat_model
 from nl2sql_assistant.prompts.explain_prompt import EXPLAIN_PROMPT
+
 
 def explain_sql(schema_text: str, sql: str) -> str:
     """

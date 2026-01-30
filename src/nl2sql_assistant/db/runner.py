@@ -13,7 +13,23 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+# Use a proper SQL parser to determine statement type reliably.
+import sqlglot
+
 SELECT_ONLY_RE = re.compile(r"^\s*select\b", re.IGNORECASE)
+ALLOWED_WRITE = {"insert", "update", "delete"}
+
+
+def validate_single_statement(sql: str) -> str:
+    parsed = sqlglot.parse_one(sql)
+    stmt = parsed.key.lower()  # e.g. select/update/insert/delete
+    return stmt
+
+
+def validate_write(sql: str) -> None:
+    stmt = validate_single_statement(sql)
+    if stmt not in ALLOWED_WRITE:
+        raise ValueError("Write mode allows only INSERT/UPDATE/DELETE.")
 
 
 def validate_select_only(sql: str) -> None:
@@ -33,6 +49,18 @@ def validate_select_only(sql: str) -> None:
 
     if semicolons == 1 and not cleaned.rstrip().endswith(";"):
         raise ValueError("Invalid semicolon usage detected.")
+
+
+def run_write(db_path: Path, sql: str) -> int:
+    validate_write(sql)
+    sql_clean = sql.strip().rstrip(";")
+
+    with sqlite3.connect(db_path) as conn:
+        conn.execute("PRAGMA foreign_keys = ON;")
+        # Transactional safety
+        with conn:
+            cur = conn.execute(sql_clean)
+            return cur.rowcount
 
 
 def run_query(db_path: Path, sql: str, limit: int = 200) -> tuple[list[str], list[tuple[Any, ...]]]:
