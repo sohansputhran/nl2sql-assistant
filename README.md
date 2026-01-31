@@ -1,69 +1,78 @@
-# NL2SQL Assistant
+# NL2SQL Assistant (Open‑Source, Production‑Oriented)
 
-Schema-aware Natural Language to SQL assistant using open-source LLMs, Streamlit, and CI/CD — built incrementally using Agile methodology.
+A **schema‑aware Natural Language → SQL system** built using **open‑source LLMs**, **RAG**, **Streamlit**, and **CI/CD**, developed step‑by‑step using **Agile methodology**.
+
+This project goes beyond demos and focuses on **safe, explainable, human‑in‑the‑loop AI for databases**.
 
 ---
 
 ## Project Vision
-The goal of this project is to build a **real-world, production-quality NL → SQL assistant** that:
-- Converts natural language questions into safe, executable SQL
-- Uses **open-source LLMs only** (no paid APIs)
-- Demonstrates **prompt engineering, classification, and guardrails**
-- Is fully deployable via **Streamlit**
-- Follows **Agile development with CI/CD and tests**
 
-This project is designed to be **portfolio-ready** and recruiter-friendly.
+Build a **real‑world NL → SQL assistant** that:
 
----
-
-## Tech Stack
-- **Python 3.11**
-- **Streamlit** – UI & deployment
-- **SQLite** – Lightweight relational database
-- **LangChain (planned)** – Prompt templates & chains
-- **Open-source LLMs (planned)** – Ollama + LLaMA / Mistral
-- **Ruff** – Linting & formatting
-- **Pytest** – Testing
-- **GitHub Actions** – CI/CD
+- Converts natural language into **SQL queries (read + write)**
+- Uses **open‑source LLMs only** (via Ollama)
+- Applies **guardrails, validation, and risk classification**
+- Uses **RAG** to ground database write operations
+- Requires **explicit human confirmation** before data modification
+- Is fully deployable with **Streamlit**
+- Follows **Agile development, CI/CD, and testing best practices**
 
 ---
 
-## Repository Structure
-```
-nl2sql-assistant/
-│
-├── app/
-│   ├── Home.py
-│   └── pages/
-│       └── 1_Schema_Explorer.py
-│
-├── src/
-│   └── nl2sql_assistant/
-│       ├── config.py
-│       └── db/
-│           ├── bootstrap.py
-│           ├── schema.py
-│           └── runner.py
-│
-├── data/
-│   └── sample.db
-│
-├── tests/
-│   ├── test_smoke.py
-│   └── test_schema.py
-│
-├── .github/workflows/
-│   └── ci.yml
-│
-├── pyproject.toml
-├── requirements.txt
-└── README.md
-```
+## Current Status
+
+### ✅ Stage 0 – Foundation
+- Streamlit application skeleton
+- Ruff linting & formatting
+- Pytest test suite
+- GitHub Actions CI pipeline
+
+### ✅ Stage 1 – SQLite Schema Explorer
+- Sample SQLite database
+- Prompt‑ready schema extraction
+- Schema Explorer UI
+- SELECT‑only query runner
+
+### ✅ Stage 2 – NL → SQL (Read Queries)
+- Open‑source LLM adapter (Ollama)
+- Few‑shot PromptTemplates
+- Schema‑aware SQL generation
+- SELECT‑only hard validation
+
+### ✅ Stage 3 – Guardrails & Risk Classification
+- LLM‑as‑critic pattern
+- Structured JSON risk output
+- Risk levels: low / medium / high
+
+### ✅ Stage 4 – UX & Explainability
+- Auto‑run risk checks
+- Natural language SQL explanation
+- Optional SQL auto‑fix
+
+### ✅ Stage 5 – Write Mode with RAG
+- Intent‑aware write pipeline
+- RAG‑grounded SQL generation
+- Strict validation + transactions
+- Database backup & rollback
+- Human‑in‑the‑loop confirmation
 
 ---
 
-## Running Locally
+## 🧱 Tech Stack
+- Python 3.11
+- Streamlit
+- SQLite
+- LangChain
+- Ollama
+- RAG (BM25)
+- Ruff
+- Pytest
+- GitHub Actions
 
+---
+
+## Run Locally
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .\.venv\Scripts\activate
@@ -73,16 +82,8 @@ pytest -q
 ruff check .
 ruff format .
 
+ollama serve
+ollama pull llama3.1
+
 streamlit run app/Home.py
 ```
-
----
-
-## Agile Roadmap
-
-- Stage 2: NL → SQL generation (PromptTemplates + open-source LLM)
-- Stage 3: Guardrails & classification
-- Stage 4: Full Streamlit UX + charts
-- Stage 5: Deployment & documentation polish
-
----
