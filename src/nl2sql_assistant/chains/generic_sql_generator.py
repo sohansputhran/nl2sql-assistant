@@ -16,4 +16,6 @@ def generate_generic_sql(user_prompt: str, dialect: str, schema_text: str | None
     """
     chain = GENERIC_SQL_PROMPT | get_chat_model() | StrOutputParser()
     schema = schema_text or ""  # empty schema is allowed here
-    return chain.invoke({"dialect": dialect, "user_prompt": user_prompt, "schema_text": schema}).strip()
+    return chain.invoke(
+        {"dialect": dialect, "user_prompt": user_prompt, "schema_text": schema}
+    ).strip()

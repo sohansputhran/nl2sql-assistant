@@ -26,13 +26,13 @@ This is the baseline Streamlit app with CI (ruff + pytest).
 
 with st.expander("Testing"):
     st.markdown(
-    """
+        """
 ### Pages
 - **Schema Explorer**: inspect DB schema and try sample queries.
 - **NL → SQL (DB-aware)**: generate SQL for *this app’s database* and run it.
 - **Write Mode (RAG)**: generate safe write SQL using retrieved context (human approval required).
 - **Generic NL → SQL**: generate SQL for any request (not executed).
 """
-)
+    )
 
 st.info("When you see this page, Initial Stage is finished.")
