@@ -12,8 +12,8 @@ from nl2sql_assistant.db.schema import schema_as_text
 
 st.set_page_config(page_title="NL → SQL", layout="wide")
 
-st.title("NL → SQL Generator")
-st.caption("Uses an open-source LLM via Ollama. Output is SELECT-only and must be reviewed.")
+st.title("NL -> SQL Generator")
+st.caption("DB-aware: SQL is generated specifically for your SQLite database schema and can be executed.")
 
 DB_PATH = Path("data/sample.db")
 ensure_sample_db(DB_PATH)
