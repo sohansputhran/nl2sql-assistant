@@ -27,10 +27,11 @@ This is the baseline Streamlit app with CI (ruff + pytest).
 with st.expander("Testing"):
     st.markdown(
         """
-- Repo structure
-- Streamlit skeleton
-- Ruff + Pytest
-- GitHub Actions CI
+### Pages
+- **Schema Explorer**: inspect DB schema and try sample queries.
+- **NL → SQL (DB-aware)**: generate SQL for *this app’s database* and run it.
+- **Write Mode (RAG)**: generate safe write SQL using retrieved context (human approval required).
+- **Generic NL → SQL**: generate SQL for any request (not executed).
 """
     )
 
