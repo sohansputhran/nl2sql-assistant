@@ -1,12 +1,3 @@
-"""
-Home.py
-------------
-Purpose:
-- This is the home page of the Streamlit app for NL2SQL Assistant.
-- It provides an overview of the app and its features.
-
-"""
-
 import streamlit as st
 
 from nl2sql_assistant.ui.layout import set_app_config, inject_base_css, page_header
@@ -19,92 +10,99 @@ page_header(
     "Production-oriented NL -> SQL with schema grounding, guardrails, and isolated Write Mode (RAG + human approval).",
 )
 
-# --- Top summary (recruiter-focused) ---
-c1, c2, c3 = st.columns(3)
-c1.metric("Execution", "DB-aware (Read-only default)")
-c2.metric("Safety", "Validation + Risk Classification")
-c3.metric("Models", "Open-source via Ollama")
+# --- Recruiter-friendly summary ---
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Modes", "DB-aware + Generic")
+c2.metric("Execution", "Read-only by default")
+c3.metric("Write Safety", "Isolated + approval")
+c4.metric("Models", "Open-source (Ollama)")
 
 st.markdown(
     """
-**What this is:** An open-source NL → SQL system built with **Python + Streamlit + LangChain + Ollama**.  
+**What this is:** An open-source NL -> SQL system built with **Python + Streamlit + LangChain + Ollama**.
 It supports **two capabilities**:
-- **DB-aware NL → SQL (Executable)** for a known SQLite DB (schema-grounded, validated, guarded)
-- **Generic NL → SQL (Non-executable)** for drafting SQL across dialects (SQLite/Postgres/MySQL)
 
-**Core safety design:**  
-- Read mode defaults to **SELECT-only** and blocks unsafe SQL  
-- Write mode is **isolated**, **JSON-only generation**, strict validation, **human confirmation**, and transactional execution (with rollback/backup)
+- **DB-aware NL -> SQL (Executable)**: converts NL to SQL for a known SQLite database using the *real schema* to reduce hallucinations.
+- **Generic NL -> SQL (Non-executable)**: drafts SQL for multiple dialects without assuming a database.
+**Safety-first design (core guarantees):**
+- Default is **SELECT-only** execution with strict SQL validation.
+- A separate **Write Mode** supports INSERT/UPDATE/DELETE with **JSON-only generation**, strict rules, and **human confirmation** before execution.
 """
 )
 
 st.divider()
 
-# --- Page cards ---
-st.subheader("App Pages")
-st.caption("Start here: pick the mode you want. Each page follows the same safety-first workflow.")
+# --- Pages overview (no links) ---
+st.subheader("Pages Overview")
+st.caption("Use the sidebar to navigate. Each page is designed with consistent safety signals and validation steps.")
 
-left, right = st.columns(2)
+col_left, col_right = st.columns(2)
 
-with left:
+with col_left:
     st.markdown("### DB-aware NL -> SQL (Read Mode)")
     st.write(
-        "Ask questions about the SQLite database. The system uses the real schema to reduce hallucinations, "
-        "validates SQL strictly, and executes **SELECT-only** queries by default."
+        """
+Ask questions about the connected SQLite database.  
+The system grounds generation using the database schema, applies risk classification, and validates SQL strictly.
+**Execution is SELECT-only by default.**
+"""
     )
-    st.page_link("app/pages/2_DB_Aware_NL2SQL.py", label="Open DB-aware NL -> SQL")
 
     st.markdown("### Generic NL -> SQL (Non-executable)")
     st.write(
-        "Convert natural language into SQL **without assuming a database**. Choose a dialect "
-        "(SQLite / PostgreSQL / MySQL) and optionally provide a schema for higher accuracy. Output is **SQL only**."
+        """
+Convert natural language into SQL **without** connecting to a database.  
+Supports selecting a SQL dialect (SQLite / PostgreSQL / MySQL) and optional schema input for accuracy.
+**Outputs SQL only; never executes.**
+"""
     )
-    st.page_link("app/pages/4_Generic_NL2SQL.py", label="Open Generic NL -> SQL")
 
-with right:
+with col_right:
     st.markdown("### Write Mode (Isolated + Human Approval)")
     st.write(
-        "Safely generate INSERT/UPDATE/DELETE with schema + data dictionary grounding via RAG. "
-        "Uses **JSON-only** SQL generation, strict allowlists, risk classification, and requires **explicit approval** "
-        "before running inside a transaction (with rollback/backup)."
+        """
+Safely generate INSERT/UPDATE/DELETE using schema + data dictionary grounding via RAG.
+Designed for production guardrails:
+- intent detection (read vs write)
+- **JSON-only** SQL generation
+- strict allowlist validation
+- human-in-the-loop confirmation
+- transaction + rollback + database backup
+"""
     )
-    st.page_link("app/pages/3_Write_Mode.py", label="Open Write Mode")
 
 st.divider()
 
-# --- “Why this is production-grade” section ---
+# --- Why production-oriented (recruiter section) ---
 st.subheader("Why this is production-oriented")
-col1, col2 = st.columns(2)
 
-with col1:
+a, b = st.columns(2)
+with a:
     st.markdown(
         """
 **Reliability**
-- Schema-aware prompting and grounding
-- Strict SQL validation before execution
-- Risk classification + guardrails
+- Schema-grounded prompting to reduce hallucinations  
+- Strict SQL validation and risk classification  
+- Clear separation of read/write/generic logic  
 
 **Maintainability**
-- Clear separation: read / write / generic logic
-- CI-safe architecture (tests don’t require model downloads)
+- Clean repo structure and modular components  
+- CI-safe design (tests don't require model downloads)
 """
     )
 
-with col2:
+with b:
     st.markdown(
         """
 **Safety**
-- Default SELECT-only execution
-- Write mode requires:
-  - intent detection
-  - JSON-only generation
-  - human-in-the-loop confirmation
-  - transaction + rollback + backup
+- Read mode defaults to SELECT-only  
+- Write mode is isolated and gated by approval  
+- Transaction + rollback + backups for destructive operations  
 
 **Open-source**
-- Local models via Ollama
-- LangChain PromptTemplates & chains
+- Local LLMs via Ollama  
+- LangChain PromptTemplates and chains
 """
     )
 
-st.caption("Tip: Start with DB-aware Read Mode, then explore Write Mode for guarded updates.")
+st.caption("Navigate using the sidebar to start with DB-aware Read Mode.")
