@@ -2,9 +2,17 @@ import streamlit as st
 
 from nl2sql_assistant.chains.generic_sql_generator import generate_generic_sql
 
-st.set_page_config(page_title="Generic NL → SQL", page_icon="🧾", layout="wide")
+st.set_page_config(page_title="Generic NL → SQL", layout="wide")
 
-st.title("🧾 Generic NL → SQL")
+
+with st.sidebar:
+    st.markdown("### Navigation")
+    st.caption("DB-aware query, Write Mode (RAG + approval), or Generic SQL drafting.")
+    st.divider()
+    st.markdown("### Safety posture")
+    st.caption("Read mode is SELECT-only. Write mode requires confirmation + rollback.")
+
+st.title("Generic NL → SQL")
 st.caption("Converts any natural language into SQL (not tied to your database).")
 
 dialect = st.selectbox("SQL dialect", ["SQLite", "PostgreSQL", "MySQL"], index=0)

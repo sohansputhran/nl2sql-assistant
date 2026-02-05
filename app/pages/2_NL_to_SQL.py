@@ -12,6 +12,15 @@ from nl2sql_assistant.db.schema import schema_as_text
 
 st.set_page_config(page_title="NL → SQL", layout="wide")
 
+
+with st.sidebar:
+    st.markdown("### Navigation")
+    st.caption("DB-aware query, Write Mode (RAG + approval), or Generic SQL drafting.")
+    st.divider()
+    st.markdown("### Safety posture")
+    st.caption("Read mode is SELECT-only. Write mode requires confirmation + rollback.")
+
+
 st.title("NL -> SQL Generator")
 st.caption(
     "DB-aware: SQL is generated specifically for your SQLite database schema and can be executed."

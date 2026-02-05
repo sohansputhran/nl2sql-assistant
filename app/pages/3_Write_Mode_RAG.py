@@ -9,6 +9,14 @@ from nl2sql_assistant.rag.retriever_bm25 import retrieve
 
 st.set_page_config(page_title="Write Mode (RAG)", layout="wide")
 
+with st.sidebar:
+    st.markdown("### Navigation")
+    st.caption("DB-aware query, Write Mode (RAG + approval), or Generic SQL drafting.")
+    st.divider()
+    st.markdown("### Safety posture")
+    st.caption("Read mode is SELECT-only. Write mode requires confirmation + rollback.")
+
+
 st.title("Write Mode (RAG)")
 st.caption(
     "Generates INSERT/UPDATE/DELETE using retrieved context. Requires explicit confirmation."
