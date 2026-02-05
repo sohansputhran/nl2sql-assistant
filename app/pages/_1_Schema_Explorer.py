@@ -16,6 +16,14 @@ from nl2sql_assistant.db.bootstrap import ensure_sample_db
 from nl2sql_assistant.db.runner import run_query
 from nl2sql_assistant.db.schema import schema_as_text
 
+with st.sidebar:
+    st.markdown("### Navigation")
+    st.caption("DB-aware query, Write Mode (RAG + approval), or Generic SQL drafting.")
+    st.divider()
+    st.markdown("### Safety posture")
+    st.caption("Read mode is SELECT-only. Write mode requires confirmation + rollback.")
+
+
 st.set_page_config(page_title="Schema Explorer", page_icon="🗄️", layout="wide")
 
 st.title("Schema Explorer")
