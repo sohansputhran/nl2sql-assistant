@@ -144,9 +144,7 @@ with right:
         st.toast("Risk check complete")
 
     if validate:
-        ok, msg = validate_sql(
-            sql=st.session_state["generated_sql"], mode="read"
-        )
+        ok, msg = validate_sql(sql=st.session_state["generated_sql"], mode="read")
         st.session_state["validated"] = ok
         st.session_state["executable"] = ok
         st.session_state["validation_msg"] = msg

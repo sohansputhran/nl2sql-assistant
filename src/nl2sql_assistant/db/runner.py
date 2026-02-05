@@ -19,7 +19,6 @@ from typing import Any
 # Use a proper SQL parser to determine statement type reliably.
 import sqlglot
 
-
 SELECT_ONLY_RE = re.compile(r"^\s*select\b", re.IGNORECASE)
 ALLOWED_WRITE = {"insert", "update", "delete"}
 
@@ -78,7 +77,6 @@ def validate_sql(sql: str, *, mode: str = "read") -> tuple[bool, str]:
     except Exception as e:
         # Catch-all safety net (never leak stack traces to UI)
         return False, f"Validation failed due to unexpected error: {e}"
-
 
 
 def validate_single_statement(sql: str) -> str:
