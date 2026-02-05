@@ -11,8 +11,17 @@ import streamlit as st
 
 # Warm up cached resources so pages load fast and consistently.
 from nl2sql_assistant.app_state import get_rag_index
+from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
 
 get_rag_index()
+
+set_app_config()
+inject_base_css()
+page_header(
+    "NL2SQL Assistant",
+    "Schema-aware NL → SQL with guardrails, RAG grounding, and isolated Write Mode.",
+)
+
 
 st.set_page_config(page_title="NL2SQL Assistant", page_icon="🧠", layout="wide")
 
