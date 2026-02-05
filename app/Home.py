@@ -1,6 +1,6 @@
 import streamlit as st
 
-from nl2sql_assistant.ui.layout import set_app_config, inject_base_css, page_header
+from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
 
 set_app_config()
 inject_base_css()
@@ -34,7 +34,9 @@ st.divider()
 
 # --- Pages overview (no links) ---
 st.subheader("Pages Overview")
-st.caption("Use the sidebar to navigate. Each page is designed with consistent safety signals and validation steps.")
+st.caption(
+    "Use the sidebar to navigate. Each page is designed with consistent safety signals and validation steps."
+)
 
 col_left, col_right = st.columns(2)
 
