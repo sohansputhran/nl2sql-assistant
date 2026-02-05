@@ -1,6 +1,4 @@
-import pytest
-
-from nl2sql_assistant.validation.sql_validator import validate_sql
+from nl2sql_assistant.db.runner import validate_sql
 
 
 def test_validate_sql_accepts_simple_select():
