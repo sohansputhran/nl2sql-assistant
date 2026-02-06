@@ -10,6 +10,18 @@ page_header(
     "Production-oriented NL -> SQL with schema grounding, guardrails, and isolated Write Mode (RAG + human approval).",
 )
 
+# Sidebar framing (kept small & product-like)
+with st.sidebar:
+    st.markdown("### Navigation")
+    st.caption("- DB-aware query \n- Write Mode (RAG + approval) \n- Generic SQL drafting")
+    st.divider()
+    st.markdown("### Safety posture")
+    st.caption(
+        "- Read mode is SELECT-only\n"
+        "- Write mode requires explicit confirmation\n"
+        "- Optional DB backup before execution"
+    )
+
 # --- Recruiter-friendly summary ---
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Modes", "DB-aware + Generic")
