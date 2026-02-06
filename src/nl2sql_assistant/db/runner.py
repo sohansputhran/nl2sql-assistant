@@ -11,20 +11,20 @@ Design goals:
 
 from __future__ import annotations
 
+import os
 import re
 import sqlite3
-
-import os
-import requests
-
 from pathlib import Path
 from typing import Any
+
+import requests
 
 # Use a proper SQL parser to determine statement type reliably.
 import sqlglot
 
 SELECT_ONLY_RE = re.compile(r"^\s*select\b", re.IGNORECASE)
 ALLOWED_WRITE = {"insert", "update", "delete"}
+
 
 def ollama_is_available() -> bool:
     # Allow forcing off in cloud
@@ -35,6 +35,7 @@ def ollama_is_available() -> bool:
         return r.status_code == 200
     except Exception:
         return False
+
 
 def validate_sql(sql: str, *, mode: str = "read") -> tuple[bool, str]:
     """

@@ -120,7 +120,7 @@ if generate:
         st.warning("Please enter a natural language request.")
     else:
         schema_text = st.session_state["schema_optional"].strip() or None
-        
+
         # Generic SQL is not validated/executed because there is no DB context.
         # This is intentional safety behavior.
         res = generate_generic_sql(
