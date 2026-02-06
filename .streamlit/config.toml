@@ -1,5 +1,13 @@
-[server]
-headless = true
-
 [theme]
 base = "light"
+primaryColor = "#2563EB"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F6F8FB"
+textColor = "#0F172A"
+font = "sans serif"
+
+[client]
+showErrorDetails = "none"
+
+[server]
+headless = true
