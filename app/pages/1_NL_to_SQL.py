@@ -24,9 +24,7 @@ page_header(
 # Sidebar framing (kept small & product-like)
 with st.sidebar:
     st.markdown("### Navigation")
-    st.caption("- DB-aware query \n"
-               "- Write Mode (RAG + approval) \n"
-               "- Generic SQL drafting")
+    st.caption("- DB-aware query \n- Write Mode (RAG + approval) \n- Generic SQL drafting")
     st.divider()
     st.markdown("### Safety posture")
     st.caption(

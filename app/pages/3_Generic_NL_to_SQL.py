@@ -14,9 +14,7 @@ page_header(
 # Sidebar framing (kept small & product-like)
 with st.sidebar:
     st.markdown("### Navigation")
-    st.caption("- DB-aware query \n"
-               "- Write Mode (RAG + approval) \n"
-               "- Generic SQL drafting")
+    st.caption("- DB-aware query \n- Write Mode (RAG + approval) \n- Generic SQL drafting")
     st.divider()
     st.markdown("### Safety posture")
     st.caption(
@@ -61,8 +59,8 @@ with left:
             key="schema_optional",
             height=160,
             placeholder="Paste your schema here (tables, columns, relationships). Example:\n\n"
-                       "CREATE TABLE customers(customer_id INT, name TEXT);\n"
-                       "CREATE TABLE orders(order_id INT, customer_id INT, total NUMERIC);",
+            "CREATE TABLE customers(customer_id INT, name TEXT);\n"
+            "CREATE TABLE orders(order_id INT, customer_id INT, total NUMERIC);",
             label_visibility="collapsed",
         )
 

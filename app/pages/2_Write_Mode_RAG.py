@@ -1,4 +1,5 @@
 import json
+
 import streamlit as st
 
 from nl2sql_assistant.app_state import get_db_path, get_rag_index
@@ -18,9 +19,7 @@ page_header(
 # Sidebar framing (kept small & product-like)
 with st.sidebar:
     st.markdown("### Navigation")
-    st.caption("- DB-aware query \n"
-               "- Write Mode (RAG + approval) \n"
-               "- Generic SQL drafting")
+    st.caption("- DB-aware query \n- Write Mode (RAG + approval) \n- Generic SQL drafting")
     st.divider()
     st.markdown("### Safety posture")
     st.caption(
@@ -32,7 +31,9 @@ with st.sidebar:
 # Session state defaults
 st.session_state.setdefault("write_prompt", "")
 st.session_state.setdefault("retrieved_context", "")
-st.session_state.setdefault("write_sql_res", None)  # stores dataclass/object returned by generate_write_sql
+st.session_state.setdefault(
+    "write_sql_res", None
+)  # stores dataclass/object returned by generate_write_sql
 st.session_state.setdefault("confirm_execute", False)
 st.session_state.setdefault("backup_first", True)
 
@@ -144,7 +145,9 @@ with right:
         )
 
         # Execute button is disabled until user checks confirmation + SQL exists
-        can_execute = bool(st.session_state["confirm_execute"]) and bool(res.sql and res.sql.strip())
+        can_execute = bool(st.session_state["confirm_execute"]) and bool(
+            res.sql and res.sql.strip()
+        )
         execute = st.button("Execute Write", use_container_width=True, disabled=not can_execute)
 
         if execute:
