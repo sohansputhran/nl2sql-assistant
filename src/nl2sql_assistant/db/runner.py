@@ -13,6 +13,10 @@ from __future__ import annotations
 
 import re
 import sqlite3
+
+import os
+import requests
+
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +26,15 @@ import sqlglot
 SELECT_ONLY_RE = re.compile(r"^\s*select\b", re.IGNORECASE)
 ALLOWED_WRITE = {"insert", "update", "delete"}
 
+def ollama_is_available() -> bool:
+    # Allow forcing off in cloud
+    if os.getenv("DISABLE_OLLAMA", "").lower() in {"1", "true", "yes"}:
+        return False
+    try:
+        r = requests.get("http://127.0.0.1:11434/api/tags", timeout=1)
+        return r.status_code == 200
+    except Exception:
+        return False
 
 def validate_sql(sql: str, *, mode: str = "read") -> tuple[bool, str]:
     """

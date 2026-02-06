@@ -8,7 +8,7 @@ from nl2sql_assistant.chains.risk_classifier import classify_risk  # add this im
 # from nl2sql_assistant.chains.sql_explainer import explain_sql  # import the explain_sql function
 from nl2sql_assistant.chains.sql_generator import generate_sql
 from nl2sql_assistant.db.bootstrap import ensure_sample_db
-from nl2sql_assistant.db.runner import run_query, validate_sql
+from nl2sql_assistant.db.runner import ollama_is_available, run_query, validate_sql
 from nl2sql_assistant.db.schema import schema_as_text
 from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
 from nl2sql_assistant.ui.widget import status_row
@@ -92,6 +92,14 @@ with left:
         st.session_state["validation_msg"] = ""
         st.session_state["result_df"] = None
         st.rerun()
+
+    # For deployed demo, show warning if Ollama not available
+    if not ollama_is_available():
+        st.warning(
+            "Ollama is not available in this environment. "
+            "This deployed demo runs in UI-only mode. Run locally for full LLM features."
+        )
+        st.stop()
 
     if gen:
         res = generate_sql(schema_text=schema_text, question=st.session_state["question"])

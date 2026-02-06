@@ -4,6 +4,7 @@ import streamlit as st
 
 from nl2sql_assistant.app_state import get_db_path, get_rag_index
 from nl2sql_assistant.chains.write_sql_generator import generate_write_sql
+from nl2sql_assistant.db.runner import ollama_is_available
 from nl2sql_assistant.db.write_runner import backup_db, execute_write
 from nl2sql_assistant.rag.retriever_bm25 import retrieve
 from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
@@ -86,6 +87,14 @@ with left:
         st.session_state["confirm_execute"] = False
         st.session_state["backup_first"] = True
         st.rerun()
+
+    # For deployed demo, show warning if Ollama not available
+    if not ollama_is_available():
+        st.warning(
+            "Ollama is not available in this environment. "
+            "This deployed demo runs in UI-only mode. Run locally for full LLM features."
+        )
+        st.stop()
 
     if generate:
         if not st.session_state["write_prompt"].strip():

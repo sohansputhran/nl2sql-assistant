@@ -1,6 +1,7 @@
 import streamlit as st
 
 from nl2sql_assistant.chains.generic_sql_generator import generate_generic_sql
+from nl2sql_assistant.db.runner import ollama_is_available
 from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
 
 set_app_config()
@@ -112,7 +113,14 @@ if generate:
     else:
         schema_text = st.session_state["schema_optional"].strip() or None
 
-        # Note:
+            # For deployed demo, show warning if Ollama not available
+        if not ollama_is_available():
+            st.warning(
+                "Ollama is not available in this environment. "
+                "This deployed demo runs in UI-only mode. Run locally for full LLM features."
+            )
+            st.stop()
+        
         # Generic SQL is not validated/executed because there is no DB context.
         # This is intentional safety behavior.
         res = generate_generic_sql(
