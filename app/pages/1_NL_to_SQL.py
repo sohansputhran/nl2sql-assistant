@@ -21,6 +21,20 @@ page_header(
     "DB-aware: SQL is generated for your SQLite schema and can be executed (SELECT-only by default).",
 )
 
+# Sidebar framing (kept small & product-like)
+with st.sidebar:
+    st.markdown("### Navigation")
+    st.caption("- DB-aware query \n"
+               "- Write Mode (RAG + approval) \n"
+               "- Generic SQL drafting")
+    st.divider()
+    st.markdown("### Safety posture")
+    st.caption(
+        "- Read mode is SELECT-only\n"
+        "- Write mode requires explicit confirmation\n"
+        "- Optional DB backup before execution"
+    )
+
 # --- Session state defaults ---
 st.session_state.setdefault("question", "Show completed orders with customer name, newest first.")
 st.session_state.setdefault("generated_sql", "")
@@ -43,11 +57,6 @@ DB_PATH = Path("data/sample.db")
 ensure_sample_db(DB_PATH)
 
 schema_text = schema_as_text(DB_PATH)
-
-question = st.text_input(
-    "Ask a question about the data (natural language)",
-    value="Show completed orders with customer name, newest first.",
-)
 
 # --- Main layout ---
 left, right = st.columns([1.05, 1.25], gap="large")
@@ -73,9 +82,9 @@ with left:
     # Actions grouped: looks more product-like
     c1, c2 = st.columns([1, 1])
     with c1:
-        gen = st.button("Generate SQL", type="primary", use_container_width=True)
+        gen = st.button("Generate SQL", type="primary", width="stretch")
     with c2:
-        clear = st.button("Clear", use_container_width=True)
+        clear = st.button("Clear", width="stretch")
 
     if clear:
         st.session_state["generated_sql"] = ""
@@ -87,7 +96,7 @@ with left:
         st.rerun()
 
     if gen:
-        res = generate_sql(schema_text=schema_text, question=question)
+        res = generate_sql(schema_text=schema_text, question=st.session_state["question"])
         st.session_state["generated_sql"] = res.sql
         st.session_state["notes"] = res.notes
 
@@ -124,19 +133,21 @@ with right:
     # Guardrails + execution controls (kept together!)
     a1, a2, a3 = st.columns([1, 1, 1])
     with a1:
-        run_risk = st.button("Run risk check", use_container_width=True)
+        run_risk = st.button("Run risk check", width="stretch")
     with a2:
-        validate = st.button("Validate SQL", use_container_width=True)
+        validate = st.button("Validate SQL", width="stretch")
     with a3:
         run = st.button(
             "Execute (SELECT only)",
-            use_container_width=True,
+            width="stretch",
             disabled=not st.session_state["validated"],
         )
 
     if run_risk:
         risk = classify_risk(
-            schema_text=schema_text, question=question, sql=st.session_state["generated_sql"]
+            schema_text=schema_text,
+            question=st.session_state["question"],
+            sql=st.session_state["generated_sql"],
         )
         st.session_state["risk_result"] = risk
         st.success("Risk check completed.")
@@ -167,7 +178,7 @@ st.subheader("3) Results")
 if st.session_state["result_df"] is None:
     st.caption("Execute a validated query to see results here.")
 else:
-    st.dataframe(st.session_state["result_df"], use_container_width=True)
+    st.dataframe(st.session_state["result_df"], width="stretch")
 
 # Optional: keep “debug”/details hidden so UI stays clean for recruiters
 with st.expander("Developer details (optional)", expanded=False):
