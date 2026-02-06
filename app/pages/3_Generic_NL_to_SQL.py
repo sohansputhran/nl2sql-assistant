@@ -105,6 +105,14 @@ with right:
             use_container_width=True,
         )
 
+# For deployed demo, show warning if Ollama not available
+if not ollama_is_available():
+    st.warning(
+        "Ollama is not available in this environment. "
+        "This deployed demo runs in UI-only mode. Run locally for full LLM features."
+    )
+    st.stop()
+
 # Generation action (after layout so UI feels stable)
 if generate:
     nl = st.session_state["nl_request"].strip()
@@ -112,14 +120,6 @@ if generate:
         st.warning("Please enter a natural language request.")
     else:
         schema_text = st.session_state["schema_optional"].strip() or None
-
-            # For deployed demo, show warning if Ollama not available
-        if not ollama_is_available():
-            st.warning(
-                "Ollama is not available in this environment. "
-                "This deployed demo runs in UI-only mode. Run locally for full LLM features."
-            )
-            st.stop()
         
         # Generic SQL is not validated/executed because there is no DB context.
         # This is intentional safety behavior.
