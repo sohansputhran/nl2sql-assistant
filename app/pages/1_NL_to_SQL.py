@@ -8,7 +8,7 @@ from nl2sql_assistant.chains.risk_classifier import classify_risk  # add this im
 # from nl2sql_assistant.chains.sql_explainer import explain_sql  # import the explain_sql function
 from nl2sql_assistant.chains.sql_generator import generate_sql
 from nl2sql_assistant.db.bootstrap import ensure_sample_db
-from nl2sql_assistant.db.runner import ollama_is_available, run_query, validate_sql
+from nl2sql_assistant.db.runner import run_query, validate_sql
 from nl2sql_assistant.db.schema import schema_as_text
 from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
 from nl2sql_assistant.ui.widget import status_row
@@ -46,7 +46,7 @@ st.session_state.setdefault("result_df", None)
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("Mode", "DB-aware (Read)")
 m2.metric("Execution", "SELECT-only")
-m3.metric("Models", "Ollama (local)")
+m3.metric("Models", "HuggingFace API")
 m4.metric("Safety", "Validate + Risk Check")
 
 st.divider()
@@ -66,11 +66,6 @@ with left:
         key="question",
         placeholder="e.g., List top 10 customers by total spend in 2024",
         label_visibility="collapsed",
-    )
-
-    # Move "local setup" note to a compact sidebar-style info
-    st.info(
-        "Local setup: run `ollama serve` and ensure your model is available (e.g., `ollama pull llama3.1`)."
     )
 
     # Schema expander stays but visually cleaner
@@ -93,14 +88,6 @@ with left:
         st.session_state["result_df"] = None
         st.rerun()
 
-    # For deployed demo, show warning if Ollama not available
-    if not ollama_is_available():
-        st.warning(
-            "Ollama is not available in this environment. "
-            "This deployed demo runs in UI-only mode. Run locally for full LLM features."
-        )
-        st.stop()
-
     if gen:
         res = generate_sql(schema_text=schema_text, question=st.session_state["question"])
         st.session_state["generated_sql"] = res.sql
@@ -114,6 +101,7 @@ with left:
             "Generated. Run validation + risk check before executing."
         )
         st.success("SQL generated.")
+
 
 with right:
     st.subheader("2) Review SQL")

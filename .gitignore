@@ -6,6 +6,14 @@ __pycache__/
 # C extensions
 *.so
 
+# Secrets
+.streamlit/secrets.toml
+
+# HuggingFace cache
+.cache/
+huggingface/
+.huggingface/
+
 # Distribution / packaging
 .Python
 build/

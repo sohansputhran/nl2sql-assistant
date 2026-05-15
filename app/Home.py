@@ -10,6 +10,7 @@ page_header(
     "Production-oriented NL -> SQL with schema grounding, guardrails, and isolated Write Mode (RAG + human approval).",
 )
 
+
 # Sidebar framing (kept small & product-like)
 with st.sidebar:
     st.markdown("### Navigation")

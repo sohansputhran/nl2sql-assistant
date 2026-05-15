@@ -6,7 +6,7 @@ from typing import Any
 
 from langchain_core.output_parsers import StrOutputParser
 
-from nl2sql_assistant.llm.ollama_client import get_chat_model
+from nl2sql_assistant.llm.huggingface_client import get_hf_model
 from nl2sql_assistant.prompts.write_sql_prompt import WRITE_SQL_PROMPT
 
 
@@ -23,7 +23,7 @@ def generate_write_sql(context: str, user_prompt: str) -> WriteSQLResult:
     Generates a single write statement (INSERT/UPDATE/DELETE) using retrieved context.
     IMPORTANT: We do NOT execute unless validated + user confirms.
     """
-    chain = WRITE_SQL_PROMPT | get_chat_model() | StrOutputParser()
+    chain = WRITE_SQL_PROMPT | get_hf_model() | StrOutputParser()
     raw = chain.invoke({"context": context, "user_prompt": user_prompt})
 
     try:

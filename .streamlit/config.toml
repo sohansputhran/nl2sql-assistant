@@ -1,13 +1,15 @@
 [theme]
-base = "light"
-primaryColor = "#2563EB"
+primaryColor = "#8B5CF6"  # Purple
 backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F6F8FB"
-textColor = "#0F172A"
+secondaryBackgroundColor = "#F3F4F6"
+textColor = "#1F2937"
 font = "sans serif"
-
-[client]
-showErrorDetails = "none"
 
 [server]
 headless = true
+port = 8501
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false

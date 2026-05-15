@@ -7,7 +7,7 @@ from typing import Any
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable
 
-from nl2sql_assistant.llm.ollama_client import get_chat_model
+from nl2sql_assistant.llm.huggingface_client import get_hf_model
 from nl2sql_assistant.prompts.risk_prompt import RISK_PROMPT
 
 
@@ -38,7 +38,7 @@ def build_risk_chain() -> Runnable:
 
     We keep this minimal and do JSON parsing ourselves for better control.
     """
-    model = get_chat_model()
+    model = get_hf_model()
     return RISK_PROMPT | model | StrOutputParser()
 
 
