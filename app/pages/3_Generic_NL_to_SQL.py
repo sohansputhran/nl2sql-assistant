@@ -1,7 +1,6 @@
 import streamlit as st
 
 from nl2sql_assistant.chains.generic_sql_generator import generate_generic_sql
-from nl2sql_assistant.db.runner import ollama_is_available
 from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
 
 set_app_config()
@@ -104,14 +103,6 @@ with right:
             mime="text/sql",
             use_container_width=True,
         )
-
-# For deployed demo, show warning if Ollama not available
-if not ollama_is_available():
-    st.warning(
-        "Ollama is not available in this environment. "
-        "This deployed demo runs in UI-only mode. Run locally for full LLM features."
-    )
-    st.stop()
 
 # Generation action (after layout so UI feels stable)
 if generate:
