@@ -1,55 +1,79 @@
+import os
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
-from nl2sql_assistant.chains.risk_classifier import classify_risk  # add this import at top
-
-# from nl2sql_assistant.chains.sql_explainer import explain_sql  # import the explain_sql function
+from nl2sql_assistant.chains.risk_classifier import classify_risk
 from nl2sql_assistant.chains.sql_generator import generate_sql
 from nl2sql_assistant.db.bootstrap import ensure_sample_db
 from nl2sql_assistant.db.runner import run_query, validate_sql
 from nl2sql_assistant.db.schema import schema_as_text
 from nl2sql_assistant.ui.layout import inject_base_css, page_header, set_app_config
-from nl2sql_assistant.ui.widget import status_row
 
 set_app_config()
 inject_base_css()
 
 page_header(
-    "NL -> SQL Generator",
-    "DB-aware: SQL is generated for your SQLite schema and can be executed (SELECT-only by default).",
+    "📊 DB-Aware Query",
+    "Ask questions about your database in natural language. Auto-validated with schema grounding.",
 )
 
-# Sidebar framing (kept small & product-like)
+# Sidebar with API key input
 with st.sidebar:
-    st.markdown("### Navigation")
-    st.caption("- DB-aware query \n- Write Mode (RAG + approval) \n- Generic SQL drafting")
+    st.markdown("### 🔑 HuggingFace API")
+    
+    if "HUGGINGFACE_API_TOKEN" in st.secrets:
+        st.success("✓ API key configured")
+    else:
+        api_key_input = st.text_input(
+            "Enter API Token",
+            type="password",
+            help="Get your token from https://huggingface.co/settings/tokens",
+            placeholder="hf_...",
+        )
+        
+        if api_key_input:
+            os.environ["HUGGINGFACE_API_TOKEN"] = api_key_input
+            st.success("✓ API key set for session")
+        else:
+            st.warning("⚠ API key required")
+    
     st.divider()
-    st.markdown("### Safety posture")
+    
+    st.markdown("### 🧭 Navigation")
     st.caption(
-        "- Read mode is SELECT-only\n"
-        "- Write mode requires explicit confirmation\n"
-        "- Optional DB backup before execution"
+        "**DB-aware Query** - Ask questions about your database\n\n"
+        "**Write Mode** - Insert/update/delete with RAG\n\n"
+        "**Generic SQL** - Draft SQL for any dialect"
+    )
+    
+    st.divider()
+    
+    st.markdown("### 🛡️ Safety")
+    st.caption(
+        "✓ Read queries are SELECT-only\n\n"
+        "✓ Write operations require approval\n\n"
+        "✓ Automatic schema validation"
     )
 
 # --- Session state defaults ---
 st.session_state.setdefault("question", "Show completed orders with customer name, newest first.")
 st.session_state.setdefault("generated_sql", "")
 st.session_state.setdefault("risk", "unknown")
+st.session_state.setdefault("risk_result", None)
 st.session_state.setdefault("validated", False)
 st.session_state.setdefault("executable", False)
 st.session_state.setdefault("validation_msg", "")
 st.session_state.setdefault("result_df", None)
 
-# --- Small, recruiter-friendly summary row ---
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Mode", "DB-aware (Read)")
-m2.metric("Execution", "SELECT-only")
-m3.metric("Models", "HuggingFace API")
-m4.metric("Safety", "Validate + Risk Check")
+# --- Info banner ---
+st.info(
+    "💡 **How it works**: Enter your question → SQL is generated with schema awareness → "
+    "Automatic validation & risk check → Execute safely (SELECT-only)"
+)
 
-st.divider()
+st.markdown("<br>", unsafe_allow_html=True)
 
 DB_PATH = Path("data/sample.db")
 ensure_sample_db(DB_PATH)
@@ -57,27 +81,28 @@ ensure_sample_db(DB_PATH)
 schema_text = schema_as_text(DB_PATH)
 
 # --- Main layout ---
-left, right = st.columns([1.05, 1.25], gap="large")
+left, right = st.columns([1, 1], gap="large")
 
 with left:
-    st.subheader("1) Ask in natural language")
-    st.text_input(
+    st.markdown("#### 1️⃣ Ask Your Question")
+    st.text_area(
         "Question",
         key="question",
         placeholder="e.g., List top 10 customers by total spend in 2024",
         label_visibility="collapsed",
+        height=100,
     )
 
-    # Schema expander stays but visually cleaner
-    with st.expander("Schema used for generation", expanded=False):
-        st.code(schema_text, language="text")
+    # Schema expander
+    with st.expander("📋 View Database Schema", expanded=False):
+        st.code(schema_text, language="sql")
 
-    # Actions grouped: looks more product-like
-    c1, c2 = st.columns([1, 1])
-    with c1:
-        gen = st.button("Generate SQL", type="primary", width="stretch")
-    with c2:
-        clear = st.button("Clear", width="stretch")
+    # Actions
+    col_gen, col_clear = st.columns([2, 1])
+    with col_gen:
+        gen = st.button("🚀 Generate SQL", type="primary", width="stretch")
+    with col_clear:
+        clear = st.button("🗑️ Clear", width="stretch")
 
     if clear:
         st.session_state["generated_sql"] = ""
@@ -89,91 +114,166 @@ with left:
         st.rerun()
 
     if gen:
-        res = generate_sql(schema_text=schema_text, question=st.session_state["question"])
-        st.session_state["generated_sql"] = res.sql
-        st.session_state["notes"] = res.notes
+        with st.spinner("🔮 Generating SQL..."):
+            res = generate_sql(schema_text=schema_text, question=st.session_state["question"])
+            st.session_state["generated_sql"] = res.sql
+            st.session_state["notes"] = res.notes
 
-        # After generation, make it "not validated" until user runs checks.
-        st.session_state["validated"] = False
-        st.session_state["executable"] = False
-        st.session_state["risk"] = "unknown"
-        st.session_state["validation_msg"] = (
-            "Generated. Run validation + risk check before executing."
-        )
-        st.success("SQL generated.")
+        # Automatic validation
+        with st.spinner("🔍 Validating SQL..."):
+            ok, msg = validate_sql(sql=st.session_state["generated_sql"], mode="read")
+            st.session_state["validated"] = ok
+            st.session_state["executable"] = ok
+            st.session_state["validation_msg"] = msg
 
+        # Automatic risk check
+        with st.spinner("🛡️ Running risk assessment..."):
+            risk_result = classify_risk(
+                schema_text=schema_text,
+                question=st.session_state["question"],
+                sql=st.session_state["generated_sql"],
+            )
+            
+            # Extract risk level string from RiskResult object
+            if hasattr(risk_result, 'risk'):
+                # Direct attribute access
+                risk_level = str(risk_result.risk)
+            else:
+                # Parse from string representation
+                import re
+                risk_str = str(risk_result)
+                match = re.search(r"RISK_LEVEL='([^']+)'", risk_str)
+                if match:
+                    risk_level = match.group(1)
+                else:
+                    # Last resort: try to find risk level in string
+                    risk_str_lower = risk_str.lower()
+                    if 'low' in risk_str_lower:
+                        risk_level = 'low'
+                    elif 'medium' in risk_str_lower:
+                        risk_level = 'medium'
+                    elif 'high' in risk_str_lower:
+                        risk_level = 'high'
+                    else:
+                        risk_level = 'unknown'
+            
+            st.session_state["risk"] = risk_level
+            st.session_state["risk_result"] = risk_result
+
+        st.rerun()
 
 with right:
-    st.subheader("2) Review SQL")
-    st.caption("Edit if needed. Execution remains SELECT-only unless you switch to Write Mode.")
+    st.markdown("#### 2️⃣ Review Generated SQL")
 
-    # Make editor smaller by default; grow only when needed
+    # SQL editor
     st.session_state["generated_sql"] = st.text_area(
         "Generated SQL",
         value=st.session_state["generated_sql"],
-        height=220,  # key fix: reduce massive empty box
-        placeholder="Click 'Generate SQL' to create a query…",
+        height=180,
+        placeholder="Click 'Generate SQL' to create a query...",
         label_visibility="collapsed",
     )
 
-    # Status row (looks “enterprise”)
-    status_row(
-        mode="DB-aware (Read)",
-        executable=bool(st.session_state["executable"]),
-        risk=str(st.session_state["risk"]),
-        validated=bool(st.session_state["validated"]),
-    )
-
-    # Guardrails + execution controls (kept together!)
-    a1, a2, a3 = st.columns([1, 1, 1])
-    with a1:
-        run_risk = st.button("Run risk check", width="stretch")
-    with a2:
-        validate = st.button("Validate SQL", width="stretch")
-    with a3:
-        run = st.button(
-            "Execute (SELECT only)",
-            width="stretch",
-            disabled=not st.session_state["validated"],
-        )
-
-    if run_risk:
-        risk = classify_risk(
-            schema_text=schema_text,
-            question=st.session_state["question"],
-            sql=st.session_state["generated_sql"],
-        )
-        st.session_state["risk_result"] = risk
-        st.success("Risk check completed.")
-        st.session_state["risk"] = risk
-        st.toast("Risk check complete")
-
-    if validate:
-        ok, msg = validate_sql(sql=st.session_state["generated_sql"], mode="read")
-        st.session_state["validated"] = ok
-        st.session_state["executable"] = ok
-        st.session_state["validation_msg"] = msg
-
+    # Validation status
     if st.session_state["validation_msg"]:
         if st.session_state["validated"]:
-            st.success(st.session_state["validation_msg"])
+            st.success(f"✅ {st.session_state['validation_msg']}")
         else:
-            st.error(st.session_state["validation_msg"])
+            st.error(f"❌ {st.session_state['validation_msg']}")
 
-    if run:
-        cols, rows = run_query(DB_PATH, st.session_state["generated_sql"], limit=200)
-        df = pd.DataFrame(rows, columns=cols)
-        st.session_state["result_df"] = df
+    # Risk assessment display
+    if st.session_state["risk"] != "unknown":
+        # Get the full risk result object if available
+        risk_result_obj = st.session_state.get("risk_result", None)
+        
+        # Try to extract clean risk level from the object
+        risk_level = "unknown"
+        flags = []
+        suggestions = []
+        
+        if risk_result_obj:
+            # If it's an object with 'risk' attribute
+            if hasattr(risk_result_obj, 'risk'):
+                risk_level = str(risk_result_obj.risk).lower()
+            else:
+                # It might be a string representation, try to parse it
+                risk_str = str(risk_result_obj)
+                if "RISK_LEVEL=" in risk_str:
+                    # Extract from string like "RISKRESULT(RISK_LEVEL='MEDIUM', ...)"
+                    import re
+                    match = re.search(r"RISK_LEVEL='([^']+)'", risk_str)
+                    if match:
+                        risk_level = match.group(1).lower()
+            
+            # Try to extract flags
+            if hasattr(risk_result_obj, 'flags') and risk_result_obj.flags:
+                flags = risk_result_obj.flags
+            
+            # Try to extract suggestions  
+            if hasattr(risk_result_obj, 'suggestions') and risk_result_obj.suggestions:
+                suggestions = risk_result_obj.suggestions
+        
+        # Fallback: use the stored risk string
+        if risk_level == "unknown" and st.session_state["risk"] != "unknown":
+            risk_level = str(st.session_state["risk"]).lower()
+        
+        # Color coding
+        risk_colors = {
+            "low": ("🟢", "#10B981", "#ECFDF5"),
+            "medium": ("🟡", "#F59E0B", "#FFFBEB"),
+            "high": ("🔴", "#EF4444", "#FEF2F2"),
+        }
+        emoji, border_color, bg_color = risk_colors.get(risk_level, ("⚪", "#6B7280", "#F9FAFB"))
+        
+        # Create styled risk card
+        st.markdown(
+            f"""
+            <div style='
+                background-color: {bg_color};
+                border-left: 4px solid {border_color};
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 1rem 0;
+            '>
+                <div style='display: flex; align-items: center; gap: 0.5rem;'>
+                    <span style='font-size: 1.5rem;'>{emoji}</span>
+                    <strong style='color: {border_color}; font-size: 1.1rem;'>Risk Level: {risk_level.upper()}</strong>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-st.divider()
+    # Execute button
+    st.markdown("#### 3️⃣ Execute Query")
+    execute_btn = st.button(
+        "▶️ Execute (SELECT only)",
+        width="stretch",
+        type="primary",
+        disabled=not st.session_state["validated"],
+    )
+
+    if execute_btn:
+        with st.spinner("⚙️ Executing query..."):
+            cols, rows = run_query(DB_PATH, st.session_state["generated_sql"], limit=200)
+            df = pd.DataFrame(rows, columns=cols)
+            st.session_state["result_df"] = df
+        st.rerun()
+
+st.markdown("---")
 
 # --- Results area ---
-st.subheader("3) Results")
+st.markdown("#### 📊 Query Results")
 if st.session_state["result_df"] is None:
     st.caption("Execute a validated query to see results here.")
 else:
     st.dataframe(st.session_state["result_df"], width="stretch")
-
-# Optional: keep “debug”/details hidden so UI stays clean for recruiters
-with st.expander("Developer details (optional)", expanded=False):
-    st.write("Put prompt, retrieved schema chunks, validator output, and trace info here.")
+    
+    # Download option
+    csv = st.session_state["result_df"].to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 Download as CSV",
+        data=csv,
+        file_name="query_results.csv",
+        mime="text/csv",
+    )

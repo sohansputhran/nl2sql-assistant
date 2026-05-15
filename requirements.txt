@@ -6,6 +6,7 @@ pandas>=2.2.0
 langchain>=0.2.14
 langchain-community>=0.2.12
 langchain_ollama>=0.0.6
+langchain-huggingface>=1.0.0
 huggingface_hub>=0.23.0
 pydantic>=2.7.0
 
