@@ -9,7 +9,7 @@
 
 Transform natural language questions into accurate SQL queries using HuggingFace's SQLCoder-7B-2, with zero hallucinations through schema injection and RAG-based retrieval.
 
-🌐 **[Live Demo](https://nl-to-sql-assistant.streamlit.app/)** | 📚 **[Documentation](#documentation)** | 🚀 **[Quick Start](#quick-start)**
+🌐 **[Live Demo](https://nl-to-sql-assistant.streamlit.app/)**
 
 ---
 
@@ -298,67 +298,6 @@ Add to your Streamlit Cloud dashboard → Settings → Secrets:
 HUGGINGFACE_API_TOKEN = "hf_your_token_here"
 ```
 
-### **Model Configuration**
-Edit `src/nl2sql_assistant/llm/huggingface_client.py`:
-```python
-self.model_id = "defog/sqlcoder-7b-2"  # Change model here
-self.temperature = 0.0                  # Deterministic for SQL
-```
-
----
-
-## 📚 Documentation
-
-### **API Documentation**
-
-#### **Generate SQL (DB-Aware)**
-```python
-from nl2sql_assistant.chains.sql_generator import generate_sql
-from nl2sql_assistant.db.schema import schema_as_text
-
-schema = schema_as_text("path/to/database.db")
-result = generate_sql(
-    schema_text=schema,
-    question="Show top 10 customers by revenue"
-)
-
-print(result.sql)      # Generated SQL
-print(result.notes)    # Any additional notes
-```
-
-#### **Classify Risk**
-```python
-from nl2sql_assistant.chains.risk_classifier import classify_risk
-
-risk = classify_risk(
-    schema_text=schema,
-    question="Delete all orders from 2020",
-    sql="DELETE FROM orders WHERE year = 2020"
-)
-
-print(risk.risk)        # low/medium/high
-print(risk.flags)       # List of risk flags
-print(risk.suggestions) # Recommendations
-```
-
-#### **Execute Query Safely**
-```python
-from nl2sql_assistant.db.runner import run_query, validate_sql
-
-# Validate first
-is_valid, message = validate_sql(sql, mode="read")
-
-if is_valid:
-    columns, rows = run_query("path/to/db.db", sql, limit=100)
-```
-
-### **Prompt Templates**
-
-Located in `src/nl2sql_assistant/prompts/`:
-- `sqlcoder_prompt.py` - Main prompt for SQLCoder-7B-2
-- `risk_prompt.py` - Risk classification prompt
-- `write_prompt.py` - Write mode with RAG context
-
 **Example Prompt Structure:**
 ```
 ### Task
@@ -372,8 +311,6 @@ Generate a SQL query to answer: {question}
 - Use proper JOIN conditions
 - No DROP/DELETE unless explicitly requested
 
-### SQL Query
-```
 
 ---
 
@@ -390,15 +327,6 @@ pytest tests/ --cov=src/nl2sql_assistant --cov-report=html
 # Specific test file
 pytest tests/test_sql_generator.py -v
 ```
-
-### **Test Categories**
-- **Unit Tests**: Individual functions (schema extraction, validation)
-- **Integration Tests**: Full pipeline (NL → SQL → Execution)
-- **Safety Tests**: SQL injection, dangerous operations
-- **Performance Tests**: Latency, accuracy benchmarks
-
----
-
 ## 🚀 Deployment
 
 ### **Streamlit Cloud (Recommended)**
@@ -463,32 +391,6 @@ pytest tests/ --cov=src/
 
 ---
 
-## 📝 Roadmap
-
-### **Completed** ✅
-- [x] Schema-aware SQL generation
-- [x] Dual-mode architecture (DB-aware + Generic)
-- [x] RAG-based write mode
-- [x] Multi-layer safety controls
-- [x] HuggingFace API integration
-- [x] Streamlit Cloud deployment
-- [x] Automatic validation and risk classification
-
-### **In Progress** 🚧
-- [ ] Query caching (reduce API costs)
-- [ ] Multi-turn conversations (context retention)
-- [ ] Query optimization suggestions
-- [ ] Enhanced metrics dashboard
-
-### **Planned** 📋
-- [ ] Support for PostgreSQL/MySQL connections
-- [ ] Custom model fine-tuning guide
-- [ ] Batch query processing
-- [ ] SQL explanation mode ("Why this query?")
-- [ ] Export to visualization tools (Tableau, PowerBI)
-
----
-
 ## ❓ FAQ
 
 ### **Q: Does this work with my existing database?**
@@ -508,10 +410,6 @@ Yes! Edit `src/nl2sql_assistant/llm/huggingface_client.py` and change `self.mode
 2. Update `DB_PATH` in the page files
 3. Schema is extracted automatically
 
-### **Q: What SQL dialects are supported?**
-- **DB-Aware Mode**: SQLite (more coming soon)
-- **Generic Mode**: SQLite, PostgreSQL, MySQL
-
 ---
 
 ## 📄 License
@@ -522,7 +420,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **[Defog AI](https://defog.ai)** for the excellent SQLCoder model
 - **[HuggingFace](https://huggingface.co)** for the Inference API
 - **[Streamlit](https://streamlit.io)** for the amazing framework
 - **[LangChain](https://langchain.com)** for LLM orchestration tools
@@ -536,12 +433,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📧 Email: puthran.sohan@gmail.com
 - 💼 LinkedIn: [linkedin.com/in/sohansputhran](https://www.linkedin.com/in/sohansputhran/)
 - 🐙 GitHub: [github.com/sohansputhran](https://github.com/sohansputhran)
-
----
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=sohansputhran/nl2sql-assistant&type=Date)](https://star-history.com/#sohansputhran/nl2sql-assistant&Date)
 
 ---
 
