@@ -20,7 +20,7 @@ page_header(
 # Sidebar with API key input
 with st.sidebar:
     st.markdown("### 🔑 HuggingFace API")
-    
+
     if "HUGGINGFACE_API_TOKEN" in st.secrets:
         st.success("✓ API key configured")
     else:
@@ -30,24 +30,24 @@ with st.sidebar:
             help="Get your token from https://huggingface.co/settings/tokens",
             placeholder="hf_...",
         )
-        
+
         if api_key_input:
             os.environ["HUGGINGFACE_API_TOKEN"] = api_key_input
             st.success("✓ API key set for session")
         else:
             st.warning("⚠ API key required")
-    
+
     st.divider()
-    
+
     st.markdown("### 🧭 Navigation")
     st.caption(
         "**DB-aware Query** - Ask questions about your database\n\n"
         "**Write Mode** - Insert/update/delete with RAG\n\n"
         "**Generic SQL** - Draft SQL for any dialect"
     )
-    
+
     st.divider()
-    
+
     st.markdown("### 🛡️ Safety")
     st.caption(
         "✓ Read queries are SELECT-only\n\n"
@@ -171,7 +171,7 @@ with right:
             "▶️ Execute Write Operation",
             use_container_width=True,
             type="primary",
-            disabled=not can_execute
+            disabled=not can_execute,
         )
 
         if execute:
@@ -188,11 +188,11 @@ with right:
 
                     with st.spinner("⚙️ Executing write operation..."):
                         affected = execute_write(db_path, res.sql, res.params)
-                    
+
                     st.success(f"✅ Write executed successfully! Rows affected: {affected}")
-                    
+
                     # Reset confirmation after successful execution
                     st.session_state["confirm_execute"] = False
-                    
+
                 except Exception as e:
                     st.error(f"❌ Execution failed: {e}")

@@ -1,5 +1,5 @@
 import os
-from typing import Any, List, Optional
+from typing import Any
 
 from langchain_core.language_models.llms import LLM
 
@@ -11,6 +11,7 @@ def _get_api_token() -> str:
     """
     try:
         import streamlit as st
+
         token = st.secrets.get("HUGGINGFACE_API_TOKEN", "")
         if token:
             return token
@@ -37,7 +38,7 @@ class HuggingFaceInferenceLLM(LLM):
     def _llm_type(self) -> str:
         return "huggingface_inference"
 
-    def _call(self, prompt: str, stop: Optional[List[str]] = None, **kwargs: Any) -> str:
+    def _call(self, prompt: str, stop: list[str] | None = None, **kwargs: Any) -> str:
         from huggingface_hub import InferenceClient
 
         client = InferenceClient(model=self.model_id, token=self.api_token)
@@ -79,9 +80,11 @@ def get_hf_model(
 
 class ModelLoadingError(Exception):
     """Model is still loading on HF servers."""
+
     pass
 
 
 class HuggingFaceAPIError(Exception):
     """General HF API error."""
+
     pass

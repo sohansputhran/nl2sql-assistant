@@ -16,7 +16,7 @@ page_header(
 # Sidebar with API key input
 with st.sidebar:
     st.markdown("### 🔑 HuggingFace API")
-    
+
     # Check if running on Streamlit Cloud (secrets available) or locally
     if "HUGGINGFACE_API_TOKEN" in st.secrets:
         st.success("✓ API key configured")
@@ -28,7 +28,7 @@ with st.sidebar:
             help="Get your token from https://huggingface.co/settings/tokens",
             placeholder="hf_...",
         )
-        
+
         if api_key_input:
             os.environ["HUGGINGFACE_API_TOKEN"] = api_key_input
             st.success("✓ API key set for session")
@@ -36,18 +36,18 @@ with st.sidebar:
         else:
             st.warning("⚠ API key required")
             api_key_status = "missing"
-    
+
     st.divider()
-    
+
     st.markdown("### 🧭 Navigation")
     st.caption(
         "**DB-aware Query** - Ask questions about your database\n\n"
         "**Write Mode** - Insert/update/delete with RAG\n\n"
         "**Generic SQL** - Draft SQL for any dialect"
     )
-    
+
     st.divider()
-    
+
     st.markdown("### 🛡️ Safety")
     st.caption(
         "✓ Read queries are SELECT-only\n\n"

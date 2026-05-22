@@ -16,7 +16,7 @@ page_header(
 # Sidebar with API key input
 with st.sidebar:
     st.markdown("### 🔑 HuggingFace API")
-    
+
     if "HUGGINGFACE_API_TOKEN" in st.secrets:
         st.success("✓ API key configured")
     else:
@@ -26,24 +26,24 @@ with st.sidebar:
             help="Get your token from https://huggingface.co/settings/tokens",
             placeholder="hf_...",
         )
-        
+
         if api_key_input:
             os.environ["HUGGINGFACE_API_TOKEN"] = api_key_input
             st.success("✓ API key set for session")
         else:
             st.warning("⚠ API key required")
-    
+
     st.divider()
-    
+
     st.markdown("### 🧭 Navigation")
     st.caption(
         "**DB-aware Query** - Ask questions about your database\n\n"
         "**Write Mode** - Insert/update/delete with RAG\n\n"
         "**Generic SQL** - Draft SQL for any dialect"
     )
-    
+
     st.divider()
-    
+
     st.markdown("### 🛡️ Safety")
     st.caption(
         "✓ Read queries are SELECT-only\n\n"
@@ -70,7 +70,7 @@ left, right = st.columns([1, 1], gap="large")
 
 with left:
     st.markdown("#### 1️⃣ Configure")
-    
+
     st.selectbox(
         "SQL Dialect",
         ["SQLite", "PostgreSQL", "MySQL"],
@@ -123,7 +123,9 @@ with left:
 
 with right:
     st.markdown("#### 3️⃣ Generated SQL")
-    st.caption("⚠️ This SQL is **not executed**. Review and run it in your own database environment.")
+    st.caption(
+        "⚠️ This SQL is **not executed**. Review and run it in your own database environment."
+    )
 
     if not st.session_state["generated_sql"]:
         st.code("— Generate SQL to see the output here —", language="sql")
@@ -138,7 +140,7 @@ with right:
             mime="text/sql",
             use_container_width=True,
         )
-        
+
         # Copy to clipboard hint
         st.caption("💡 Tip: Click the copy button in the code block above to copy the SQL")
 
@@ -157,6 +159,6 @@ if generate:
                 schema_text=schema_text,
             )
             st.session_state["generated_sql"] = res
-        
+
         st.toast("✅ SQL generated!")
         st.rerun()

@@ -22,7 +22,7 @@ page_header(
 # Sidebar with API key input
 with st.sidebar:
     st.markdown("### 🔑 HuggingFace API")
-    
+
     if "HUGGINGFACE_API_TOKEN" in st.secrets:
         st.success("✓ API key configured")
     else:
@@ -32,24 +32,24 @@ with st.sidebar:
             help="Get your token from https://huggingface.co/settings/tokens",
             placeholder="hf_...",
         )
-        
+
         if api_key_input:
             os.environ["HUGGINGFACE_API_TOKEN"] = api_key_input
             st.success("✓ API key set for session")
         else:
             st.warning("⚠ API key required")
-    
+
     st.divider()
-    
+
     st.markdown("### 🧭 Navigation")
     st.caption(
         "**DB-aware Query** - Ask questions about your database\n\n"
         "**Write Mode** - Insert/update/delete with RAG\n\n"
         "**Generic SQL** - Draft SQL for any dialect"
     )
-    
+
     st.divider()
-    
+
     st.markdown("### 🛡️ Safety")
     st.caption(
         "✓ Read queries are SELECT-only\n\n"
@@ -133,14 +133,15 @@ with left:
                 question=st.session_state["question"],
                 sql=st.session_state["generated_sql"],
             )
-            
+
             # Extract risk level string from RiskResult object
-            if hasattr(risk_result, 'risk'):
+            if hasattr(risk_result, "risk"):
                 # Direct attribute access
                 risk_level = str(risk_result.risk)
             else:
                 # Parse from string representation
                 import re
+
                 risk_str = str(risk_result)
                 match = re.search(r"RISK_LEVEL='([^']+)'", risk_str)
                 if match:
@@ -148,15 +149,15 @@ with left:
                 else:
                     # Last resort: try to find risk level in string
                     risk_str_lower = risk_str.lower()
-                    if 'low' in risk_str_lower:
-                        risk_level = 'low'
-                    elif 'medium' in risk_str_lower:
-                        risk_level = 'medium'
-                    elif 'high' in risk_str_lower:
-                        risk_level = 'high'
+                    if "low" in risk_str_lower:
+                        risk_level = "low"
+                    elif "medium" in risk_str_lower:
+                        risk_level = "medium"
+                    elif "high" in risk_str_lower:
+                        risk_level = "high"
                     else:
-                        risk_level = 'unknown'
-            
+                        risk_level = "unknown"
+
             st.session_state["risk"] = risk_level
             st.session_state["risk_result"] = risk_result
 
@@ -185,15 +186,15 @@ with right:
     if st.session_state["risk"] != "unknown":
         # Get the full risk result object if available
         risk_result_obj = st.session_state.get("risk_result", None)
-        
+
         # Try to extract clean risk level from the object
         risk_level = "unknown"
         flags = []
         suggestions = []
-        
+
         if risk_result_obj:
             # If it's an object with 'risk' attribute
-            if hasattr(risk_result_obj, 'risk'):
+            if hasattr(risk_result_obj, "risk"):
                 risk_level = str(risk_result_obj.risk).lower()
             else:
                 # It might be a string representation, try to parse it
@@ -201,22 +202,23 @@ with right:
                 if "RISK_LEVEL=" in risk_str:
                     # Extract from string like "RISKRESULT(RISK_LEVEL='MEDIUM', ...)"
                     import re
+
                     match = re.search(r"RISK_LEVEL='([^']+)'", risk_str)
                     if match:
                         risk_level = match.group(1).lower()
-            
+
             # Try to extract flags
-            if hasattr(risk_result_obj, 'flags') and risk_result_obj.flags:
+            if hasattr(risk_result_obj, "flags") and risk_result_obj.flags:
                 flags = risk_result_obj.flags
-            
-            # Try to extract suggestions  
-            if hasattr(risk_result_obj, 'suggestions') and risk_result_obj.suggestions:
+
+            # Try to extract suggestions
+            if hasattr(risk_result_obj, "suggestions") and risk_result_obj.suggestions:
                 suggestions = risk_result_obj.suggestions
-        
+
         # Fallback: use the stored risk string
         if risk_level == "unknown" and st.session_state["risk"] != "unknown":
             risk_level = str(st.session_state["risk"]).lower()
-        
+
         # Color coding
         risk_colors = {
             "low": ("🟢", "#10B981", "#ECFDF5"),
@@ -224,7 +226,7 @@ with right:
             "high": ("🔴", "#EF4444", "#FEF2F2"),
         }
         emoji, border_color, bg_color = risk_colors.get(risk_level, ("⚪", "#6B7280", "#F9FAFB"))
-        
+
         # Create styled risk card
         st.markdown(
             f"""
@@ -241,7 +243,7 @@ with right:
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     # Execute button
@@ -268,9 +270,9 @@ if st.session_state["result_df"] is None:
     st.caption("Execute a validated query to see results here.")
 else:
     st.dataframe(st.session_state["result_df"], width="stretch")
-    
+
     # Download option
-    csv = st.session_state["result_df"].to_csv(index=False).encode('utf-8')
+    csv = st.session_state["result_df"].to_csv(index=False).encode("utf-8")
     st.download_button(
         label="📥 Download as CSV",
         data=csv,
