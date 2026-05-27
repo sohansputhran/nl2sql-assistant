@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![HuggingFace](https://img.shields.io/badge/HuggingFace-FFD21E?style=for-the-badge&logo=huggingface&logoColor=000)](https://huggingface.co/defog/sqlcoder-7b-2)
 
-**A production-ready, schema-aware Natural Language to SQL system with multi-layer safety controls.**
+**A schema-aware Natural Language to SQL system with multi-layer safety controls, built for production-oriented AI engineering.**
 
-Transform natural language questions into accurate SQL queries using HuggingFace's SQLCoder-7B-2, with zero hallucinations through schema injection and RAG-based retrieval.
+Transform natural language questions into SQL queries using HuggingFace's SQLCoder-7B-2. Schema injection constrains generation to valid tables and columns; AST-based validation and risk classification enforce safety before execution.
 
 🌐 **[Live Demo](https://nl-to-sql-assistant.streamlit.app/)**
 
@@ -23,21 +23,22 @@ Transform natural language questions into accurate SQL queries using HuggingFace
 | **✍️ Write Mode** | Generate INSERT/UPDATE/DELETE with RAG-based context and explicit approval | 🔴 Human-in-the-loop required |
 | **🌐 Generic SQL** | Draft SQL for any dialect (SQLite, PostgreSQL, MySQL) without execution | 🟡 No execution (safe) |
 
-### 🛡️ **Production-Grade Safety**
+### 🛡️ **Safety Controls (Implemented)**
 
-- ✅ **0% Hallucination Rate** - Schema injection eliminates non-existent tables/columns
-- ✅ **Automatic Validation** - AST-based SQL parsing prevents syntax errors
-- ✅ **Risk Classification** - Real-time assessment (Low/Medium/High) for every query
-- ✅ **Multi-Layer Controls** - 4+ validation checkpoints before execution
-- ✅ **Human Approval** - Explicit confirmation required for write operations
-- ✅ **Automatic Backups** - Database snapshots before destructive operations
+- ✅ **Schema Injection** - Generation constrained to actual tables/columns; no hallucinated identifiers
+- ✅ **AST-Based Validation** - SQL parsed and validated before execution; blocks dangerous operations
+- ✅ **Risk Classification** - Every query assessed Low/Medium/High before execution
+- ✅ **SELECT-Only Enforcement** - DB-Aware mode hard-blocks writes at the validation layer
+- ✅ **Human-in-the-Loop** - Explicit user confirmation required before any write operation executes
+- ✅ **Automatic Backups** - Database snapshot created before every destructive operation
+- ✅ **Transactional Rollback** - Write mode executes in a transaction; rolls back on error
 
-### ⚡ **Performance**
+### ⚙️ **Engineering Decisions**
 
-- **<2s p95 latency** for query generation
-- **85%+ accuracy** on complex multi-table JOINs
-- **40% improvement** in query relevance with RAG vs. baseline
-- **500+ queries** processed successfully
+- **SQLCoder-7B-2** — SQL-specialized model, not a general LLM; better schema adherence out of the box
+- **BM25 for RAG** — Keyword-based retrieval is deterministic and latency-free vs. embedding lookup; well-suited for structured schema/column name matching
+- **Dual-Mode Architecture** — Read and Write are intentionally separated; different risk profiles get different validation pipelines
+- **AST Validation over Regex** — `sqlparse` parses the full statement tree; regex-based approaches miss nested or multi-statement edge cases
 
 ---
 
@@ -203,19 +204,18 @@ nl2sql-assistant/
 
 ---
 
-## 📊 Performance Benchmarks
+## 🛡️ Safety Architecture
 
-| Metric | Result | Comparison |
-|--------|--------|------------|
-| **Hallucination Rate** | 0% | vs. 30% in baseline models |
-| **Query Accuracy** | 85%+ | On complex multi-table JOINs |
-| **Latency (p95)** | <2s | For query generation |
-| **RAG Improvement** | +40% | Query relevance vs. baseline |
-| **Safety Violations** | 0 | Out of 500+ queries processed |
+### **Validation Pipeline (4 Layers)**
 
-*Tested on sample database with 10 tables, 50+ columns, various query complexities.*
+Every query in DB-Aware mode passes through four checkpoints before execution:
 
----
+1. **Schema Extraction** — Live schema DDL pulled from the connected SQLite database
+2. **Schema-Injected Prompt** — Only tables/columns present in the schema are included in the LLM context
+3. **AST Validation** — `sqlparse` parses the generated SQL; blocks DROP, TRUNCATE, and non-SELECT statements in read mode
+4. **Risk Classification** — Query categorized Low/Medium/High based on operation type, JOIN complexity, and expected result size
+
+Write mode adds three additional steps: BM25 RAG retrieval, explicit user approval (checkbox-gated), and automatic DB backup before transaction execution.
 
 ## 🛡️ Safety Features Deep Dive
 
@@ -262,21 +262,21 @@ validate_sql("SELECT * FROM users WHERE age > 18")
 ## 🎓 Technical Highlights
 
 ### **Why SQLCoder-7B-2?**
-- **Specialized Model**: Fine-tuned on 20,000+ SQL examples
-- **Outperforms GPT-3.5**: On SQL-Eval benchmark
-- **Cost-Effective**: Free tier on HuggingFace
-- **Open-Source**: Full transparency, no vendor lock-in
+- **SQL-Specialized**: Fine-tuned specifically for text-to-SQL; not a general-purpose model repurposed
+- **Outperforms GPT-3.5 on SQL-Eval**: Per [defog's published benchmark](https://huggingface.co/defog/sqlcoder-7b-2)
+- **Cost-Effective**: Runs on HuggingFace free tier
+- **Open-Source**: No vendor lock-in; model can be swapped via one config change
 
 ### **Why BM25 for RAG?**
-- **Keyword-Based**: Better for structured data (schemas, column names)
-- **Fast**: No embedding generation required
-- **Deterministic**: Same query = same retrieval
-- **Lightweight**: No vector database needed
+- **Keyword-Based**: Column names and table identifiers are exact-match problems, not semantic similarity problems
+- **No Embedding Latency**: Retrieval is instant; no vector DB or embedding call required
+- **Deterministic**: Same query always retrieves the same context; easier to debug and test
+- **Lightweight**: No external service dependency
 
 ### **Why Dual-Mode Architecture?**
-- **Separation of Concerns**: Read vs. Write have different risk profiles
-- **Safety by Design**: Write mode isolated with stricter controls
-- **User Intent**: Generic mode for learning, DB-aware for execution
+- **Risk Isolation**: Write operations carry fundamentally different risk profiles; keeping them in a separate mode enforces stricter controls by design
+- **Fail-Safe Defaults**: DB-Aware mode is SELECT-only; opting into writes requires explicit user action
+- **Generic Mode for Portability**: Dialect-aware SQL drafting without execution — useful for PostgreSQL/MySQL targets without connecting a live DB
 
 ---
 
